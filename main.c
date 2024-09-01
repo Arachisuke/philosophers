@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wzeraig <wzeraig@student.42.fr>            +#+  +:+       +#+        */
+/*   By: macos <macos@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/28 13:41:30 by wzeraig           #+#    #+#             */
-/*   Updated: 2024/08/28 17:19:12 by wzeraig          ###   ########.fr       */
+/*   Updated: 2024/08/31 15:29:53 by macos            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void	init_philo(int argc, char **argv, t_data *data, t_philo *philo)
 		philo[i].eating = 0;
 		philo[i].last_meal = 0;
 		init_input(argc, argv, philo[i]);
-		philo[i].start_time = get_current
 	}
 }
 

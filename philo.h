@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wzeraig <wzeraig@student.42.fr>            +#+  +:+       +#+        */
+/*   By: macos <macos@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/28 13:39:01 by wzeraig           #+#    #+#             */
-/*   Updated: 2024/08/28 17:12:16 by wzeraig          ###   ########.fr       */
+/*   Updated: 2024/09/01 16:36:05 by macos            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef struct s_philo
 	pthread_mutex_t	*write_lock;
 	pthread_mutex_t	*dead_lock;
 	pthread_mutex_t	*meal_lock;
+	
 
 }					t_philo;
 typedef struct s_data
@@ -58,5 +59,7 @@ void				init_data(int argc, char **argv, t_data *data,
 void				init_philo(int argc, char **argv, t_data *data,
 						t_philo *philo);
 long				ft_atoii(const char *str);
+void *fonction_eat(t_philo *philo, t_data *data);
+
 
 #endif
