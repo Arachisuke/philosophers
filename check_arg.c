@@ -6,10 +6,9 @@
 /*   By: wzeraig <wzeraig@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/28 13:50:38 by wzeraig           #+#    #+#             */
-/*   Updated: 2024/08/28 15:28:54 by wzeraig          ###   ########.fr       */
+/*   Updated: 2024/09/08 18:08:00 by wzeraig          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "philo.h"
 
@@ -25,9 +24,7 @@ int	checkarg(int argc, char **argv)
 		while (argv[j][i])
 		{
 			if (argv[j][i] < '0' || argv[j][i] > '9')
-					ft_error(argc, argv);
-				if (argv[j][i + 1] < '0' || argv[j][i + 1] > '9')
-					ft_error(argc, argv);
+				return (1);
 			i++;
 		}
 		i = 0;
@@ -35,11 +32,11 @@ int	checkarg(int argc, char **argv)
 	return (0);
 }
 
-long	ft_atoii(const char *str)
+int	ft_atoii(const char *str)
 {
-	long	res;
-	int		sign;
-	int		i;
+	int	res;
+	int	sign;
+	int	i;
 
 	i = 0;
 	sign = 1;
@@ -57,7 +54,7 @@ long	ft_atoii(const char *str)
 		res = (res * 10);
 		res = res + (str[i] - 48);
 		if (res * sign > 2147483647 || res * sign < -2147483648)
-			return (2147483648);
+			return (-1);
 		i++;
 	}
 	return (res * sign);

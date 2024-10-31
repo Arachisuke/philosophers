@@ -3,62 +3,107 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macos <macos@student.42.fr>                +#+  +:+       +#+        */
+/*   By: wzeraig <wzeraig@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/01 16:21:09 by macos             #+#    #+#             */
-/*   Updated: 2024/09/01 20:23:47 by macos            ###   ########.fr       */
+/*   Updated: 2024/09/09 14:23:59 by wzeraig          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-void *routine(void *arg)
+int	take_the_fork(t_philo *philo)
 {
-    t_data *data = (t_data *)arg; // je dois le mettre en pointeur si je veux changer les variables ? dans la routine je change rien de toute maniere mais je lenverrais en pointeur au fonction par contre 
-    while(1 || data->philos->meals_eaten)
-    if (data->philos->id % 2 != 0)
-        usleep(10000); // le temps de time of eat ? ou assez de temps juste pour etre sur que chaque thread pair est passe
-    if (data->philos->id == data->philos->num_of_philos && data->philos->num_of_philos % 2 != 0)
-        usleep(1000);
-    pthread_mutex_lock(data->philos->l_fork); // je lock la droite et la gauche mtn ya que les pair qui rentre car jai bien attendu tout les pair darrive pour lock donc les impair on pas pu lock avant
-    pthread_mutex_lock(data->philos->r_fork);
-    printf("%d philo %d taking the fork", data->philos->start_time, data->philos->id); // changer le start time et mettre temps actuel du philo
-    fonction_eat(&data->philos, &data); // zone a risque
-    pthread_mutex_unlock(data->philos->r_fork);
-    pthread_mutex_unlock(data->philos->l_fork);
-    fonction_sleep(&data->philos, &data);
-    if (data->philos->dead == 0)
-    {
-        printf("philo %d die", data->philos->id);
-        return(0);  
-    }
-    
+	pthread_mutex_lock(philo->meal_lock);
+	if (philo->meals_eaten == philo->num_times_to_eat)
+		return (pthread_mutex_unlock(philo->meal_lock), 1);
+	pthread_mutex_unlock(philo->meal_lock);
+	pthread_mutex_lock(philo->dead_lock);
+	if (*philo->dead)
+		return (pthread_mutex_unlock(philo->dead_lock), 1);
+	pthread_mutex_unlock(philo->dead_lock);
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(philo->l_fork);
+		pthread_mutex_lock(philo->r_fork);
+	}
+	else
+	{
+		pthread_mutex_lock(philo->r_fork);
+		pthread_mutex_lock(philo->l_fork);
+	}
+	pthread_mutex_lock(philo->write_lock);
+	ft_print(philo, "has taken a fork");
+	ft_print(philo, "has taken a fork");
+	pthread_mutex_unlock(philo->write_lock);
+	return (0);
 }
 
-void *fonction_eat(t_philo *philo, t_data *data)
+int	ft_eat(t_philo *philo)
 {
-    if (philo->dead)
-        return(0);
-    printf("%d philo %d is eating", philo->start_time, philo->id); // changer le start time et mettre temps actuel du philo
-    usleep(philo->time_to_eat);
-    
-}
-void *fonction_sleep(t_philo *philo, t_data *data)
-{
-    if (philo->dead)
-        return(0);
-    printf("%d philo %d is sleeping", philo->start_time, philo->id); // changer le start time et mettre temps actuel du philo
-    usleep(philo->time_to_sleep);
+	pthread_mutex_lock(philo->meal_lock);
+	if (philo->meals_eaten == philo->num_times_to_eat)
+		return (pthread_mutex_unlock(philo->meal_lock), 1);
+	pthread_mutex_unlock(philo->meal_lock);
+	pthread_mutex_lock(philo->dead_lock);
+	if (*philo->dead)
+		return (pthread_mutex_unlock(philo->dead_lock), 1);
+	pthread_mutex_unlock(philo->dead_lock);
+	pthread_mutex_lock(philo->meal_lock);
+	philo->meals_eaten++;
+	philo->last_meal = get_time();
+	pthread_mutex_unlock(philo->meal_lock);
+	usleep(philo->time_to_eat * 1000);
+	pthread_mutex_lock(philo->write_lock);
+	ft_print(philo, "is eating");
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_unlock(philo->r_fork);
+	pthread_mutex_unlock(philo->write_lock);
+	return (0);
 }
 
-void *fonction_think(t_philo *philo, t_data *data)
+int	ft_sleep(t_philo *philo)
 {
-     if (philo->dead)
-        return(0);
-    printf("%d philo %d is thinking", philo->start_time, philo->id); // changer le start time et mettre temps actuel du philo
-    // calcul du temps de think
+	pthread_mutex_lock(philo->meal_lock);
+	if (philo->meals_eaten == philo->num_times_to_eat)
+		return (pthread_mutex_unlock(philo->meal_lock), 1);
+	pthread_mutex_unlock(philo->meal_lock);
+	pthread_mutex_lock(philo->dead_lock);
+	if (*philo->dead)
+		return (pthread_mutex_unlock(philo->dead_lock), 1);
+	pthread_mutex_unlock(philo->dead_lock);
+	pthread_mutex_lock(philo->write_lock);
+	ft_print(philo, "is sleeping");
+	pthread_mutex_unlock(philo->write_lock);
+	usleep(philo->time_to_sleep * 1000);
+	return (0);
 }
 
+int	ft_think(t_philo *philo)
+{
+	pthread_mutex_lock(philo->meal_lock);
+	if (philo->meals_eaten == philo->num_times_to_eat)
+		return (pthread_mutex_unlock(philo->meal_lock), 1);
+	pthread_mutex_unlock(philo->meal_lock);
+	pthread_mutex_lock(philo->dead_lock);
+	if (*philo->dead)
+		return (pthread_mutex_unlock(philo->dead_lock), 1);
+	pthread_mutex_unlock(philo->dead_lock);
+	usleep(360);
+	pthread_mutex_lock(philo->write_lock);
+	ft_print(philo, "is thinking");
+	pthread_mutex_unlock(philo->write_lock);
+	return (0);
+}
 
-// oublie pas les changement au niveau du parsing philo 0 meal 0
+void	init_forks(char **argv, pthread_mutex_t *forks)
+{
+	int	i;
+
+	i = 0;
+	while (i < ft_atoii(argv[1]))
+	{
+		pthread_mutex_init(&forks[i], NULL);
+		i++;
+	}
+}
